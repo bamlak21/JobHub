@@ -85,7 +85,8 @@ export function JobSearch({ initialJobs }: { initialJobs: Job[] }) {
           country_indeed:`${selectedTags[0] || "USA"}`
         }
       } else if (platform === "linkedin") {
-        endpoint = "http://localhost:8000/linkdin/get"
+        // endpoint = "http://localhost:8000/linkdin/get"
+        endpoint = "https://ubgry5tetyhn.share.zrok.io/linkdin/get"
         requestBody = {
           skill: searchTerm,
           location: location,

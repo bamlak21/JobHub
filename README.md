@@ -13,17 +13,40 @@
 - Scrapes job postings from **LinkedIn**, **Indeed**, **ZipRecruiter**, concurrently
 
 
-### Installation
+
+## Backend [installation]
+
+### activate and install the requirements
+```
+python3 -m venv myenv && source myenv/bin/activate && pip install -r requirements.txt
+```
+
+### start the uvicorn server 
+```
+uvicorn app.main:app --host 0.0.0.0 --port 8000
+```
+
+
+## Fontend [installation]
+
+- head to the fontend folder 
 
 ```
-pip install -r requirements.txt
+npm run dev 
 ```
 
-_Python version >= [3.10](https://www.python.org/downloads/release/python-3100/) required_
+- if you want to run with a specified port use 
+
+```
+PORT=3001 npm run dev 
+```
+
+
 
 ### Usage
--- Post request for /linkdin/get
+#### Post request for /linkdin/get
 
+- body for the post request 
 ```json
 
 {
@@ -31,14 +54,12 @@ _Python version >= [3.10](https://www.python.org/downloads/release/python-3100/)
     "location":"usa",
     "pagenumber":2
 }
-
-
-
 ```
 
 
--- Post request for /indeed/get | ziprecuter/get
+#### Post request for /indeed/get | ziprecuter/get
 
+- body for the post request 
 ```json
 
 {
@@ -50,11 +71,9 @@ _Python version >= [3.10](https://www.python.org/downloads/release/python-3100/)
     "country_indeed":"USA"
 }
 
-
-
 ```
 
-## Supported Countries for Job Searching
+## Supported Countries for Job Searching 
 
 ### **LinkedIn**
 
@@ -90,9 +109,6 @@ You can specify the following countries when searching on Indeed (use the exact 
 | United Arab Emirates | UK*          | USA*       | Uruguay        |
 | Venezuela            | Vietnam*     |            |                |
 
-### **Bayt**
-
-Bayt only uses the search_term parameter currently and searches internationally
 
 
 
