@@ -8,6 +8,7 @@ app=FastAPI()
 
 origins = [
       "https://job-hub-rho.vercel.app/",
+      "https://ubgry5tetyhn.share.zrok.io",
       "http://localhost:3000",
       "*"
 ]
