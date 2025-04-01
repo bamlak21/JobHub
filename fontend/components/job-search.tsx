@@ -76,7 +76,8 @@ export function JobSearch({ initialJobs }: { initialJobs: Job[] }) {
       let requestBody = {}
 
       if (platform === "indeed") {
-        endpoint = "http://localhost:8000/indeed/get"
+        // endpoint = "http://localhost:8000/indeed/get"
+        endpoint = "https://ubgry5tetyhn.share.zrok.io/indeed/get"
         requestBody = {
           search_term: searchTerm,
           google_search_term: `${searchTerm} near ${selectedTags[0] || "newyork"}`,
