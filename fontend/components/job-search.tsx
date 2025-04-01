@@ -97,7 +97,7 @@ export function JobSearch({ initialJobs }: { initialJobs: Job[] }) {
    
 
       else if (platform === "ziprecruiter") {
-        endpoint = "http://localhost:8000/ziprecuter/get" 
+        endpoint = "https://ubgry5tetyhn.share.zrok.io/ziprecuter/get" 
         requestBody = {
           search_term: searchTerm,
           google_search_term: `${searchTerm} near ${selectedTags[0] || "newyork"}`,
