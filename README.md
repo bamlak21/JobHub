@@ -1,11 +1,14 @@
-<div style="margin: auto; width: 50%; text-align: center; border: 1px solid black;">
-<h1>Jobhub</h1>
-</div>
+<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 20vh;">
 
-<div style="margin: auto; width: 50%; text-align: center; border: 1px solid black;">
-    <img src="demo/demo.png" width="800">
-</div>
+  <div style="text-align: center; border: 1px solid black; padding: 1px; width: 80%; max-width: 600px; margin-bottom: 20px;">
+    <h1>Jobhub</h1>
+  </div>
 
+  <div style="text-align: center; border: 1px solid black; padding: 1px; width: 90%; max-width: 800px;">
+    <img src="demo/demo.png" alt="Jobhub Demo" style="max-width: 100%; height: auto;">
+  </div>
+
+</div>
 **JobHub** - a simple nextjs / fastapi website that allows you to search for jobs with different parameters.
 
 ## Features
