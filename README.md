@@ -1,7 +1,8 @@
 <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 20vh;">
 
  <div>
-    <h1 align="center"> Loham</h1>
+    <h1 align="center">JobHub</h1>
+    <em>powerd by NILEODE</em>
 </div>
 
   <div style="text-align: center; border: 1px solid black; padding: 1px; width: 90%; max-width: 800px;">
