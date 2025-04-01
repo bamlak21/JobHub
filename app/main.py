@@ -1,6 +1,7 @@
 
-from fastapi import FastAPI
+from fastapi import FastAPI,Request, Response
 from fastapi.middleware.cors import CORSMiddleware
+import logging
 from . import schemas
 from . import jobs
 
@@ -17,13 +18,23 @@ app.add_middleware(
       CORSMiddleware,
       allow_origins=origins,
       allow_credentials=True,
-      allow_methods=["GET", "POST", "OPTIONS"], 
+      allow_methods=["*"], 
       allow_headers=["*"],
 )
 
 
 jobscr = jobs.JobScraper()
 
+
+
+logging.basicConfig(level=logging.INFO)
+
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    logging.info(f"Request Headers: {dict(request.headers)}")
+    response: Response = await call_next(request)
+    logging.info(f"Response Headers: {dict(response.headers)}")
+    return response
 
 @app.get("/") 
 async def root():

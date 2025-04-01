@@ -9,6 +9,7 @@ import type { Job } from "@/lib/types"
 import { Search, X, Loader2, Briefcase } from "lucide-react"
 import { toast } from "@/components/ui/use-toast"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import axios from 'axios';
 
 type JobPlatform = "indeed" | "linkedin" | "ziprecruiter"
 
@@ -76,52 +77,37 @@ export function JobSearch({ initialJobs }: { initialJobs: Job[] }) {
       let requestBody = {}
 
       if (platform === "indeed") {
-        // endpoint = "http://localhost:8000/indeed/get"
         endpoint = "https://ubgry5tetyhn.share.zrok.io/indeed/get"
         requestBody = {
           search_term: searchTerm,
           google_search_term: `${searchTerm} near ${selectedTags[0] || "newyork"}`,
           location: location,
-          country_indeed:`${selectedTags[0] || "USA"}`
+          country_indeed: `${selectedTags[0] || "USA"}`
         }
       } else if (platform === "linkedin") {
-        // endpoint = "http://localhost:8000/linkdin/get"
         endpoint = "https://ubgry5tetyhn.share.zrok.io/linkdin/get"
         requestBody = {
           skill: searchTerm,
           location: location,
           pagenumber: 1
         }
-      } 
-      
-   
-
-      else if (platform === "ziprecruiter") {
-        endpoint = "https://ubgry5tetyhn.share.zrok.io/ziprecuter/get" 
+      } else if (platform === "ziprecruiter") {
+        endpoint = "https://ubgry5tetyhn.share.zrok.io/ziprecuter/get"
         requestBody = {
           search_term: searchTerm,
           google_search_term: `${searchTerm} near ${selectedTags[0] || "newyork"}`,
           location: location,
           results_wanted: 20,
-          hours_old: 72, 
-          country_indeed: "USA" 
+          hours_old: 72,
+          country_indeed: "USA"
         }
       }
 
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(requestBody),
-      })
+      const response = await axios.post(endpoint, requestBody);
 
-      if (!response.ok) throw new Error(`Error: ${response.status}`)
-      const data = await response.json()
-
-      let apiJobs: Job[] = []
+      let apiJobs: Job[] = [];
       if (platform === "indeed") {
-        apiJobs = data.map((item: any[], index: number) => ({
+        apiJobs = response.data.map((item: any[], index: number) => ({
           id: `indeed-${index}`,
           title: item[1] || "Unknown Position",
           company: item[0] || "Unknown Company",
@@ -130,69 +116,51 @@ export function JobSearch({ initialJobs }: { initialJobs: Job[] }) {
           salary: item[4] || "Salary not specified",
           postedDate: item[3] || new Date().toISOString(),
           url: item[2] || "#",
-        }))
+        }));
       } else if (platform === "linkedin") {
-        apiJobs = data.map((item: any[], index: number) => ({
+        apiJobs = response.data.map((item: any[], index: number) => ({
           id: `linkedin-${index}`,
           title: item[1] || "Unknown Position",
           company: item[0] || "Unknown Company",
           location: location,
           description: `This job was posted on LinkedIn. Click "View Details" to learn more.`,
           salary: item[3] || "Salary not specified",
-          postedDate: new Date().toISOString(), // LinkedIn provides relative time, use current date as fallback
+          postedDate: new Date().toISOString(),
           url: item[2] || "#",
-        }))
-      } 
-      
-      // else if (platform === "ziprecruiter") {
-      //   apiJobs = data.map((item: any[], index: number) => ({
-      //     id: `zip-${index}`,
-      //     title: item[1] || "Unknown Position",
-      //     company: item[0] || "Unknown Company",
-      //     location: location,
-      //     description: `This job was posted on ZipRecruiter. Click "View Details" to learn more.`,
-      //     salary: item[4] || "Salary not specified",
-      //     postedDate: item[3] || new Date().toISOString(),
-      //     url: item[2] || "#",
-      //   }))
-      // }
+        }));
+      } else if (platform === "ziprecruiter") {
+        apiJobs = response.data.map((item: any, index: number) => ({
+          id: `zip-${index}`,
+          title: item.title || "Unknown Position",
+          company: item.company || "Unknown Company",
+          location: item.location || location,
+          description: item.description || `This job was posted on ZipRecruiter. Click "View Details" to learn more.`,
+          salary: item.salary_info || "Salary not specified",
+          postedDate: item.date_posted || new Date().toISOString(),
+          url: item.job_url || "#",
+        }));
+      }
 
-
-    else if (platform === "ziprecruiter") {
-      apiJobs = data.map((item: any, index: number) => ({
-        id: `zip-${index}`,
-        title: item.title || "Unknown Position",
-        company: item.company || "Unknown Company",
-        location: item.location || location,
-        description: item.description || `This job was posted on ZipRecruiter. Click "View Details" to learn more.`,
-        salary: item.salary_info || "Salary not specified",
-        postedDate: item.date_posted || new Date().toISOString(),
-        url: item.job_url || "#",
-      }))
-    }
-
-      setFilteredJobs(apiJobs)
+      setFilteredJobs(apiJobs);
       toast({
         title: `${platform.charAt(0).toUpperCase() + platform.slice(1)} search completed`,
         description: `Found ${apiJobs.length} jobs matching "${searchTerm}"`,
-      })
+      });
     } catch (error) {
-      console.error("Error fetching jobs:", error)
+      console.error("Error fetching jobs:", error);
       toast({
         title: "Error searching jobs",
         description: "There was a problem connecting to the search service. Please try again.",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
-
-  // The rest of the component remains the same...
-
+  };
 
   return (
-    <div className="space-y-8">
+    // ... (rest of your component remains the same)
+      <div className="space-y-8">
       <div className="bg-card rounded-xl shadow-lg p-6 border border-border/40">
         <div className="mb-6">
           <div className="flex flex-col md:flex-row gap-4 mb-4">
@@ -314,4 +282,3 @@ export function JobSearch({ initialJobs }: { initialJobs: Job[] }) {
     </div>
   )
 }
-
