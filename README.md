@@ -1,8 +1,8 @@
 <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 20vh;">
 
-  <div style="text-align: center; border: 1px solid black; padding: 1px; width: 80%; max-width: 600px; margin-bottom: 20px;">
-    <h1>Jobhub</h1>
-  </div>
+ <div>
+    <h1 align="center"> Loham</h1>
+</div>
 
   <div style="text-align: center; border: 1px solid black; padding: 1px; width: 90%; max-width: 800px;">
     <img src="demo/demo.png" alt="Jobhub Demo" style="max-width: 100%; height: auto;">
