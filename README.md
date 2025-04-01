@@ -2,8 +2,9 @@
 
  <div>
     <h1 align="center">JobHub</h1>
-    <em>powerd by NILEODE</em>
+    
 </div>
+<p align="center"><em>powerd by NILEODE</em></p>
 
   <div style="text-align: center; border: 1px solid black; padding: 1px; width: 90%; max-width: 800px;">
     <img src="demo/demo.png" alt="Jobhub Demo" style="max-width: 100%; height: auto;">
