@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   title: "NILEODE",
   description: "Search thousands of job opportunities from top companies around the world",
   icons: {
-    icon: "/favicon.png",
+    icon: "/favicon 32 x 32.png",
   },
 }
 
