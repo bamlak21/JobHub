@@ -30,7 +30,6 @@ logging.basicConfig(level=logging.INFO)
 
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
-    logging.info(f"Request Headers: {dict(request.headers)}")
     response: Response = await call_next(request)
     logging.info(f"Response Headers: {dict(response.headers)}")
     return response
