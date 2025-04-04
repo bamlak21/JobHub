@@ -69,7 +69,6 @@ def get_zip(title:schemas.indeedInput):
 
 
 
-
 @app.post('/indeed/get')
 def get_indeed(title:schemas.indeedInput):
 
@@ -101,9 +100,9 @@ async def search_hirebase(title:schemas.hireBase):
     return hirebase
 
 @app.post("/dice/get")
-async def search_dice(title:schemas.hireBase):
+def search_dice(title:schemas.hireBase):
     term = title.search_term
     location = title.location
 
-    dice = jobscr.search_dice(skill=term, place=location)
+    dice = jobscr.search_dice(skill=term, location=location)
     return dice

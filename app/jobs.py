@@ -8,7 +8,10 @@ import pandas as pd
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.by import By
 from selenium_stealth import stealth
+from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 from urllib.request import Request, urlopen
 import urllib.request
@@ -43,16 +46,17 @@ class JobScraper:
         # Create a unique temporary directory for user data
         self.user_data_dir = tempfile.mkdtemp()
         
-        # Set up Chrome options
+        
         self.chrome_options = webdriver.ChromeOptions()
         if headless:
             self.chrome_options.add_argument("--headless")
+            
         self.chrome_options.binary_location = "/usr/bin/google-chrome-stable"  # Set correct path
         self.chrome_options.add_argument(f"--user-data-dir={self.user_data_dir}")
         self.chrome_options.add_argument("--no-sandbox")
         self.chrome_options.add_argument("--disable-dev-shm-usage")
 
-        # Initialize the WebDriver
+
         self.driver = None
         self._initialize_driver()
         
@@ -155,7 +159,7 @@ class JobScraper:
                     break
                 
                 for item in list_items:
-                    # Initialize with default values
+                    
                     job_data = {
                         'company': 'No Company',
                         'job': 'No Job Title',
@@ -334,14 +338,14 @@ class JobScraper:
             return []
 
 
-    async def search_on_hireBase(self, search_term:str):
+    async def search_on_hireBase(self, search_term:str, location:str):
         url = "https://www.hirebase.org/api"
         headers = {"Content-Type": "application/json"}
         payload = [
             {
                 "KeywordsData": [],
                 "experienceData": [],
-                "locationData": ["America", "Canada"],
+                "locationData": [location],
                 "locationTypeData": [],
                 "salaryData": [],
                 "titleData": [search_term],
@@ -367,8 +371,147 @@ class JobScraper:
                     return await response.json()
                 else:
                     return {"error": f"Request failed with status {response.status}"}
+                
+    def search_dice(self, skill: str, location: str, max_results: int = 50) -> List[Dict[str, str]]:
+        """
+        Search Dice.com for jobs and return structured results - optimized version
+        """
+        dice_list = []
+        try:
+            logger.info(f"Searching Dice.com for {skill} jobs in {location}")
+            
+            
+            encoded_skill = urllib.parse.quote(skill)
+            encoded_location = urllib.parse.quote(location)
+            search_url = f"https://www.dice.com/jobs?q={encoded_skill}&location={encoded_location}"
+            
+            
+            self.driver.get(search_url)
+            
+            
+            wait = WebDriverWait(self.driver, 10)
+            
+            
+            try:
+                cookie_accept = wait.until(EC.element_to_be_clickable(
+                    (By.XPATH, '//*[@id="truste-show-consent"]')
+                ))
+                cookie_accept.click()
+            except:
+                pass  
+                
+           
+            try:
+                wait.until(EC.presence_of_element_located(
+                    (By.CSS_SELECTOR, "div.search-card")
+                ))
+            except:
+                logger.warning("No job cards found or page structure changed")
+                return []
+                
+            
+            if max_results > 20:  
+                try:
+                    today_filter = wait.until(EC.element_to_be_clickable((
+                        By.XPATH, '//*[@id="facets"]/dhi-accordion[1]/div[2]/div/js-single-select-filter/div/div/button[2]'
+                    )))
+                    today_filter.click()
+                    
+                    time.sleep(1)
+                except:
+                    pass  
+                    
+            
+            page = 1
+            max_pages = (max_results // 20) + 1  
+            
+            while len(dice_list) < max_results and page <= max_pages:
+                
+                html = self.driver.page_source
+                soup = BeautifulSoup(html, "html.parser")
+                job_cards = soup.find_all('div', class_='card search-card')
+                
+                
+                for card in job_cards:
+                    if len(dice_list) >= max_results:
+                        break
+                        
+                    try:
+                        
+                        job_info = {
+                            'company': 'N/A',
+                            'title': 'N/A',
+                            'url': 'N/A',
+                            'location': 'N/A',
+                            'post_date': 'N/A',
+                            'employment_type': 'Not specified',
+                            'salary': 'Not disclosed'
+                        }
+                        
+                        
+                        # Company Name
+                        company_elem = card.find('a', {'data-cy': 'search-result-company-name'})
+                        if company_elem:
+                            job_info['company'] = company_elem.get_text(strip=True)
+                        
+                        # Job Title and URL
+                        title_elem = card.find('a', {'data-cy': 'card-title-link'})
+                        if title_elem:
+                            job_info['title'] = title_elem.get_text(strip=True)
+                            job_info['url'] = title_elem['href'] if title_elem.has_attr('href') else 'N/A'
+                        
+                        # Location
+                        location_elem = card.find('span', {'data-cy': 'search-result-location'})
+                        if location_elem:
+                            job_info['location'] = location_elem.get_text(strip=True)
+                        
+                        # Post Date
+                        date_elem = card.find('span', class_='posted-date')
+                        if date_elem:
+                            job_info['post_date'] = date_elem.get_text(strip=True)
+                        
+                        # Employment Type
+                        employment_elem = card.find('span', {'data-cy': 'search-result-employment-type'})
+                        if employment_elem:
+                            job_info['employment_type'] = employment_elem.get_text(strip=True)
+                        
+                        # Salary Information
+                        salary_elem = card.find('span', {'data-cy': 'compensationText'})
+                        if salary_elem:
+                            job_info['salary'] = salary_elem.get_text(strip=True)
+                        
+                        dice_list.append(job_info)
+                        
+                    except Exception as e:
+                        logger.warning(f"Error parsing job card: {str(e)}")
+                        continue
+                
+                
+                if len(dice_list) < max_results and page < max_pages:
+                    try:
+                        next_button = self.driver.find_element(By.CSS_SELECTOR, "button[data-cy='pagination-next-page']")
+                        if next_button.is_enabled():
+                            next_button.click()
+                            page += 1
+                            
+                            time.sleep(1.5)
+                            wait.until(EC.staleness_of(job_cards[0]))
+                        else:
+                            break  
+                    except:
+                        break  
+                else:
+                    break
+                    
+            logger.info(f"Successfully extracted {len(dice_list)} jobs from Dice")
+            return dice_list
+            
+        except Exception as e:
+            logger.error(f"Dice.com search failed: {str(e)}")
+            return []
 
-    
+        
+
 
 
 
