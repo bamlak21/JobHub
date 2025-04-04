@@ -19,4 +19,6 @@ class indeedInput(BaseModel):
     country_indeed:str = "usa"
 
 
-
+class hireBase(BaseModel):
+    search_term:str
+    location:Optional[str]

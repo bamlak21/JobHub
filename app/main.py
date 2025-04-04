@@ -92,3 +92,18 @@ def get_indeed(title:schemas.indeedInput):
         )
     return indeed
 
+
+@app.post("/hirebase/get")
+async def search_hirebase(title:schemas.hireBase):
+    term = title.search_term
+
+    hirebase = await jobscr.search_on_hireBase(search_term=term)
+    return hirebase
+
+@app.post("/dice/get")
+async def search_dice(title:schemas.hireBase):
+    term = title.search_term
+    location = title.location
+
+    dice = jobscr.search_dice(skill=term, place=location)
+    return dice

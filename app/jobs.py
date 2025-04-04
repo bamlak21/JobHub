@@ -1,6 +1,9 @@
 import time
 import logging
 import random
+import aiohttp
+import json
+import asyncio
 import pandas as pd
 from bs4 import BeautifulSoup
 from selenium import webdriver
@@ -288,6 +291,7 @@ class JobScraper:
                 results_wanted=results_wanted,
                 hours_old=hours_old,
                 country_indeed=country,
+                proxies=["161.97.136.251:3128"]
             )
             
             logger.info(f"Found {len(jobs)} jobs using jobspy")
@@ -328,11 +332,43 @@ class JobScraper:
         except Exception as e:
             logger.error(f"Error in jobspy search: {str(e)}")
             return []
-    
 
 
+    async def search_on_hireBase(self, search_term:str):
+        url = "https://www.hirebase.org/api"
+        headers = {"Content-Type": "application/json"}
+        payload = [
+            {
+                "KeywordsData": [],
+                "experienceData": [],
+                "locationData": ["America", "Canada"],
+                "locationTypeData": [],
+                "salaryData": [],
+                "titleData": [search_term],
+                "EmploymentTypeData": [],
+                "include_yoe": [],
+                "include_no_salary": [],
+                "industry": [],
+                "jobCategory": [],
+                "visa": [],
+                "hideSeenJobs": [],
+                "datePosted": [2],
+                "include_remote": [],
+                "currency": ""
+            },
+            1,
+            "Relevance-and-Date",
+            ""
+        ]
         
+        async with aiohttp.ClientSession() as session:
+            async with session.post(url, headers=headers, json=payload) as response:
+                if response.status == 200:
+                    return await response.json()
+                else:
+                    return {"error": f"Request failed with status {response.status}"}
 
+    
 
 
 
