@@ -31,31 +31,26 @@ logger = logging.getLogger('job_scraper')
 class JobScraper:
     """A class for scraping job listings from various job boards."""
     def __init__(self, headless: bool = True):
-        """
-        Initialize the job scraper with browser settings.
-        
-        Args:
-            headless: Whether to run the browser in headless mode
-        """
         self.headers = {
             'user-agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) '
                          'AppleWebKit/537.36 (KHTML, like Gecko) '
                          'Chrome/92.0.4515.107 Mobile Safari/537.36'
         }
         
-        # Create a unique temporary directory for user data
-        self.user_data_dir = tempfile.mkdtemp()
-        
+        # Create temporary directory that auto-cleans up
+        self.user_data_dir = tempfile.TemporaryDirectory()
         
         self.chrome_options = webdriver.ChromeOptions()
         if headless:
-            pass
-            # self.chrome_options.add_argument("--headless")
-            
-        self.chrome_options.binary_location = "/usr/bin/google-chrome-stable"  # Set correct path
-        self.chrome_options.add_argument(f"--user-data-dir={self.user_data_dir}")
+            self.chrome_options.add_argument("--headless=new")  # Modern headless mode
+        
+        self.chrome_options.binary_location = "/usr/bin/google-chrome-stable"
+        self.chrome_options.add_argument(f"--user-data-dir={self.user_data_dir.name}")
         self.chrome_options.add_argument("--no-sandbox")
         self.chrome_options.add_argument("--disable-dev-shm-usage")
+        
+        self.driver = None
+        self._initialize_driver()
 
 
         self.driver = None
