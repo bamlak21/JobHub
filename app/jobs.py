@@ -49,7 +49,8 @@ class JobScraper:
         
         self.chrome_options = webdriver.ChromeOptions()
         if headless:
-            self.chrome_options.add_argument("--headless")
+            pass
+            # self.chrome_options.add_argument("--headless")
             
         self.chrome_options.binary_location = "/usr/bin/google-chrome-stable"  # Set correct path
         self.chrome_options.add_argument(f"--user-data-dir={self.user_data_dir}")
