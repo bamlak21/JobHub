@@ -10,5 +10,29 @@ export interface Job {
   postedDate: string
   logo?: ReactNode
   url?: string
+  source?: string
 }
+
+export interface SearchState {
+  searchTerm: string
+  location: {
+    country: string
+    region: string
+    cityLocation: string
+    apiLocation: string
+  }
+  platform: JobPlatform
+  currentPage: number
+  totalPages: number
+}
+
+export interface TagState {
+  selectedTags: string[]
+  jobTags: string[]
+  showRegions: boolean
+  selectedRegion: string
+  autoFetch: boolean
+}
+
+export type JobPlatform = "indeed" | "linkedin" | "ziprecruiter" | "dice"
 

@@ -46,7 +46,7 @@ export function JobCard({ job }: { job: Job }) {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3 pt-2">
-              <Button className="w-full sm:w-auto">Apply Now</Button>
+              {/* <Button className="w-full sm:w-auto">Apply Now</Button> */}
               {job.url ? (
                 <Button variant="outline" className="w-full sm:w-auto" onClick={() => window.open(job.url, "_blank")}>
                   <ExternalLink className="h-4 w-4 mr-2" />

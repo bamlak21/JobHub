@@ -4,6 +4,9 @@ export async function POST(request: Request) {
   try {
     const body = await request.json()
 
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 20000) // 20 second timeout
+
     const response = await fetch("https://ubgry5tetyhn.share.zrok.io/indeed/get", {
       method: "POST",
       headers: {
@@ -17,7 +20,8 @@ export async function POST(request: Request) {
         hours_old: body.hours_old || 24,
         country_indeed: body.country_indeed || "USA",
       }),
-    })
+      signal: controller.signal,
+    }).finally(() => clearTimeout(timeoutId))
 
     if (!response.ok) {
       throw new Error(`Indeed API responded with status: ${response.status}`)
@@ -27,7 +31,12 @@ export async function POST(request: Request) {
     return NextResponse.json(data)
   } catch (error) {
     console.error("Error in Indeed proxy:", error)
-    return NextResponse.json({ error: "Failed to fetch data from Indeed" }, { status: 500 })
+    const errorMessage =
+      error instanceof Error && error.name === "AbortError"
+        ? "Request timed out. Please try again."
+        : "Failed to fetch data from Indeed"
+
+    return NextResponse.json({ error: errorMessage }, { status: 500 })
   }
 }
 
