@@ -343,8 +343,8 @@ export function JobSearch({ initialJobs }: { initialJobs: Job[] }) {
           search_term: searchTerm,
           google_search_term: `${searchTerm} jobs near ${location.cityLocation} since yesterday`,
           location: location.cityLocation,
-          results_wanted: 20,
-          hours_old: 12, // Changed from 24 to 12 to match the expected format
+          results_wanted: 40,
+          hours_old: 72, // Changed from 24 to 12 to match the expected format
           country_indeed: location.apiLocation.toUpperCase() === "USA" ? "USA" : location.apiLocation.toUpperCase(),
         }
 
