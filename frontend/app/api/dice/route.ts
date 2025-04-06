@@ -5,9 +5,16 @@ export async function POST(request: Request) {
     const body = await request.json()
 
     const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 30000) 
-    
+    const timeoutId = setTimeout(() => controller.abort(), 30000) // 30 second timeout
+
+
     const location = body.location ? body.location.trim() : ""
+
+    
+    console.log("Dice API request:", {
+      search_term: body.search_term,
+      location: location,
+    })
 
     try {
       const response = await fetch("https://ubgry5tetyhn.share.zrok.io/dice/get", {
@@ -23,11 +30,19 @@ export async function POST(request: Request) {
       })
 
       clearTimeout(timeoutId) 
+
       if (!response.ok) {
         throw new Error(`Dice API responded with status: ${response.status}`)
       }
 
       const data = await response.json()
+
+      
+      console.log("Dice API response:", {
+        count: Array.isArray(data) ? data.length : "not an array",
+        sample: Array.isArray(data) && data.length > 0 ? data[0] : "no data",
+      })
+
       return NextResponse.json(data)
     } catch (fetchError) {
       
@@ -50,4 +65,3 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: errorMessage }, { status: 500 })
   }
 }
-

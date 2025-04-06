@@ -6,9 +6,21 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { JobCard } from "@/components/job-card"
 import type { Job, SearchState, TagState, JobPlatform } from "@/lib/types"
-import { Search, X, Loader2, Briefcase, ChevronLeft, ChevronRight, MapPin, Clock } from "lucide-react"
+import {
+  Search,
+  X,
+  Loader2,
+  Briefcase,
+  ChevronLeft,
+  ChevronRight,
+  MapPin,
+  Clock,
+  AlertCircle,
+  Download,
+} from "lucide-react"
 import { toast } from "@/components/ui/use-toast"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 const countries = ["United States", "United Kingdom", "Canada", "Germany", "Australia", "Remote"]
 
@@ -59,8 +71,10 @@ export function JobSearch({ initialJobs }: { initialJobs: Job[] }) {
   const [filteredJobs, setFilteredJobs] = useState<Job[]>(initialJobs)
   const [isLoading, setIsLoading] = useState(false)
   const [lastFetchTime, setLastFetchTime] = useState<Date | null>(null)
+  const [locationWarning, setLocationWarning] = useState<string | null>(null)
+  const [isExporting, setIsExporting] = useState(false)
 
-
+  
   const [searchState, setSearchState] = useState<SearchState>({
     searchTerm: "",
     location: {
@@ -98,7 +112,23 @@ export function JobSearch({ initialJobs }: { initialJobs: Job[] }) {
   
   useEffect(() => {
     setSearchState((prev) => ({ ...prev, currentPage: 1 }))
-  }, [searchState.platform])
+
+    
+    if (searchState.platform === "dice") {
+      const isUSLocation =
+        searchState.location.cityLocation.includes("USA") ||
+        searchState.location.cityLocation.includes("US") ||
+        topTechStates.some((state) => searchState.location.cityLocation.includes(state))
+
+      if (!isUSLocation && searchState.location.cityLocation !== "Remote") {
+        setLocationWarning("Dice works best with US locations. Results may be limited for international searches.")
+      } else {
+        setLocationWarning(null)
+      }
+    } else {
+      setLocationWarning(null)
+    }
+  }, [searchState.platform, searchState.location.cityLocation])
 
   
   useEffect(() => {
@@ -110,7 +140,7 @@ export function JobSearch({ initialJobs }: { initialJobs: Job[] }) {
     if (tagState.autoFetch && (tagState.selectedTags.length > 0 || tagState.jobTags.length > 0)) {
       autoFetchIntervalRef.current = setInterval(() => {
         handleSearch()
-      }, 30000) 
+      }, 30000) // 30 seconds
     }
 
     return () => {
@@ -263,12 +293,29 @@ export function JobSearch({ initialJobs }: { initialJobs: Job[] }) {
     }
   }
 
-  
+  // Toggle auto-fetch feauture
   const toggleAutoFetch = () => {
     setTagState((prev) => ({
       ...prev,
       autoFetch: !prev.autoFetch,
     }))
+  }
+
+  
+  const getLocationForPlatform = (platform: JobPlatform, location: string): string => {
+    if (platform === "dice") {
+      
+      if (location.includes("USA") || location.includes(", US")) {
+        
+        return location.split(",")[0].trim()
+      } else if (location === "Remote") {
+        return "Remote"
+      } else {
+        // For non-US locations, try to use a more generic term
+        return "USA" // Default to USA for better results
+      }
+    }
+    return location
   }
 
   
@@ -297,7 +344,7 @@ export function JobSearch({ initialJobs }: { initialJobs: Job[] }) {
           google_search_term: `${searchTerm} jobs near ${location.cityLocation} since yesterday`,
           location: location.cityLocation,
           results_wanted: 20,
-          hours_old: 24,
+          hours_old: 12, // Changed from 24 to 12 to match the expected format
           country_indeed: location.apiLocation.toUpperCase() === "USA" ? "USA" : location.apiLocation.toUpperCase(),
         }
 
@@ -316,9 +363,10 @@ export function JobSearch({ initialJobs }: { initialJobs: Job[] }) {
           requestBody = indeedZipBody
         } else if (platform === "dice") {
           endpoint = "/api/dice"
+          const formattedLocation = getLocationForPlatform("dice", location.cityLocation)
           requestBody = {
             search_term: searchTerm,
-            location: location.cityLocation,
+            location: formattedLocation,
           }
         }
 
@@ -346,14 +394,16 @@ export function JobSearch({ initialJobs }: { initialJobs: Job[] }) {
         if (platform === "indeed") {
           apiJobs = Array.isArray(data)
             ? data.map((item: any[], index: number) => {
-                
+                // Indeed format: [company, title, url, date, salary]
+                const salary = item[4] && item[4] !== "0-0 nan" ? item[4] : "Salary not specified"
+
                 return {
                   id: `indeed-${index}`,
                   title: item[1] || "Unknown Position",
                   company: item[0] || "Unknown Company",
                   location: location.cityLocation,
                   description: `This job was posted on Indeed. Click "View Details" to learn more.`,
-                  salary: item[4] || "Salary not specified",
+                  salary: salary,
                   postedDate: item[3] || new Date().toISOString(),
                   url: item[2] || "#",
                   source: "Indeed",
@@ -361,10 +411,10 @@ export function JobSearch({ initialJobs }: { initialJobs: Job[] }) {
               })
             : []
         } else if (platform === "linkedin") {
-          
+          // Parse LinkedIn response format (array of arrays)
           apiJobs = Array.isArray(data)
             ? data.map((item: any[], index: number) => {
-                
+                // LinkedIn format: [company, title, url, salary, posted_time]
                 return {
                   id: `linkedin-${index}`,
                   title: item[1] || "Unknown Position",
@@ -387,7 +437,7 @@ export function JobSearch({ initialJobs }: { initialJobs: Job[] }) {
         } else if (platform === "ziprecruiter") {
           apiJobs = Array.isArray(data)
             ? data.map((item: any[], index: number) => {
-                
+                // Assuming ZipRecruiter format is similar to Indeed: [company, title, url, date, salary]
                 return {
                   id: `ziprecruiter-${index}`,
                   title: item[1] || "Unknown Position",
@@ -404,11 +454,14 @@ export function JobSearch({ initialJobs }: { initialJobs: Job[] }) {
         } else if (platform === "dice") {
           apiJobs = Array.isArray(data)
             ? data.map((item: any, index: number) => {
+          
+                const jobLocation = item.location || location.cityLocation
+
                 return {
                   id: `dice-${index}`,
                   title: item.title || "Unknown Position",
                   company: item.company || "Unknown Company",
-                  location: item.location || location.cityLocation,
+                  location: jobLocation,
                   description: `${item.employment_type || "Full-time"} position. ${item.post_date || "Recently posted"}.`,
                   salary: item.salary || "Not disclosed",
                   postedDate: new Date().toISOString(),
@@ -469,6 +522,78 @@ export function JobSearch({ initialJobs }: { initialJobs: Job[] }) {
       ...prev,
       searchTerm: value,
     }))
+  }
+
+  // Export jobs to CSV by [v0] Thank you v0
+  const exportToCSV = () => {
+    if (filteredJobs.length === 0) {
+      toast({
+        title: "No jobs to export",
+        description: "Search for jobs first before exporting",
+        variant: "destructive",
+      })
+      return
+    }
+
+    // Set loading state for export button
+    setIsExporting(true)
+
+    try {
+      // CSV header
+      const headers = ["Title", "Company", "Location", "Description", "Salary", "Posted Date", "URL", "Source"]
+
+      // Format job data for CSV
+      const jobRows = filteredJobs.map((job) => [
+        // Escape quotes and wrap fields with quotes to handle commas
+        `"${job.title.replace(/"/g, '""')}"`,
+        `"${job.company.replace(/"/g, '""')}"`,
+        `"${job.location.replace(/"/g, '""')}"`,
+        `"${job.description.replace(/"/g, '""')}"`,
+        `"${job.salary.replace(/"/g, '""')}"`,
+        `"${new Date(job.postedDate).toLocaleDateString()}"`,
+        `"${job.url || ""}"`,
+        `"${job.source || ""}"`,
+      ])
+
+      // Combine headers and rows
+      const csvContent = [headers.join(","), ...jobRows.map((row) => row.join(","))].join("\n")
+
+      // Create a blob with the CSV data
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
+
+      // Create a download link
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement("a")
+
+      // Set link properties
+      const timestamp = new Date().toISOString().replace(/[:.]/g, "-")
+      const platform = searchState.platform
+      const searchTerm = searchState.searchTerm.replace(/\s+/g, "-").toLowerCase() || "all-jobs"
+      const filename = `${platform}-jobs-${searchTerm}-${timestamp}.csv`
+
+      link.setAttribute("href", url)
+      link.setAttribute("download", filename)
+      link.style.display = "none"
+
+      // Add link to document, click it, and remove it
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+
+      toast({
+        title: "Export successful",
+        description: `${filteredJobs.length} jobs exported to CSV`,
+      })
+    } catch (error) {
+      console.error("Error exporting to CSV:", error)
+      toast({
+        title: "Export failed",
+        description: "There was a problem exporting the data",
+        variant: "destructive",
+      })
+    } finally {
+      setIsExporting(false)
+    }
   }
 
   return (
@@ -554,19 +679,48 @@ export function JobSearch({ initialJobs }: { initialJobs: Job[] }) {
               </div>
             )}
           </div>
+
+          {locationWarning && (
+            <Alert variant="default" className="mt-4">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Location Notice</AlertTitle>
+              <AlertDescription>{locationWarning}</AlertDescription>
+            </Alert>
+          )}
         </div>
 
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-medium text-muted-foreground">Filter by location:</h2>
-            <Button
-              variant={tagState.autoFetch ? "default" : "outline"}
-              size="sm"
-              onClick={toggleAutoFetch}
-              className="text-xs"
-            >
-              {tagState.autoFetch ? "Auto-fetch: ON" : "Auto-fetch: OFF"}
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={exportToCSV}
+                disabled={isExporting || filteredJobs.length === 0}
+                className="text-xs"
+              >
+                {isExporting ? (
+                  <>
+                    <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                    Exporting...
+                  </>
+                ) : (
+                  <>
+                    <Download className="h-3 w-3 mr-1" />
+                    Export CSV
+                  </>
+                )}
+              </Button>
+              <Button
+                variant={tagState.autoFetch ? "default" : "outline"}
+                size="sm"
+                onClick={toggleAutoFetch}
+                className="text-xs"
+              >
+                {tagState.autoFetch ? "Auto-fetch: ON" : "Auto-fetch: OFF"}
+              </Button>
+            </div>
           </div>
           <div className="flex flex-wrap gap-2">
             {countries.map((country) => (
