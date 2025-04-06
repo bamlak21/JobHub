@@ -16,7 +16,7 @@ export async function POST(request: Request) {
         search_term: body.search_term,
         google_search_term: body.google_search_term,
         location: body.location,
-        results_wanted: body.results_wanted || 40, // increased the result wanted
+        results_wanted: body.results_wanted || 50, // increased the result wanted
         hours_old: body.hours_old || 72, // the duration to two days
         country_indeed: body.country_indeed || "USA",
       }),

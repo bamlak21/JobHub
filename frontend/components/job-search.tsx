@@ -343,7 +343,7 @@ export function JobSearch({ initialJobs }: { initialJobs: Job[] }) {
           search_term: searchTerm,
           google_search_term: `${searchTerm} jobs near ${location.cityLocation} since yesterday`,
           location: location.cityLocation,
-          results_wanted: 40,
+          results_wanted: 50,
           hours_old: 72, // Changed from 24 to 12 to match the expected format
           country_indeed: location.apiLocation.toUpperCase() === "USA" ? "USA" : location.apiLocation.toUpperCase(),
         }
@@ -540,7 +540,7 @@ export function JobSearch({ initialJobs }: { initialJobs: Job[] }) {
 
     try {
       // CSV header
-      const headers = ["Title", "Company", "Location", "Description", "Salary", "Posted Date", "URL", "Source"]
+      const headers = ["Title", "Company", "Location", "URL","Salary", "Posted Date", "Source"]
 
       // Format job data for CSV
       const jobRows = filteredJobs.map((job) => [

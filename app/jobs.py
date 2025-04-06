@@ -123,7 +123,7 @@ class JobScraper:
     
     
     
-    def search_linkedin(self, skill: str, place: str, page: int = 0, max_pages: int = 5) -> List[List[str]]:
+    def search_linkedin(self, skill: str, place: str, page: int = 0, max_pages: int = 10) -> List[List[str]]:
         """
         Search for jobs on LinkedIn.
         
