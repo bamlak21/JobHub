@@ -153,7 +153,3 @@ This searches the description/title and must include software, summer, 2025, one
 - Try using the proxies param to change your IP address.
 
 ---
-
-### JobPost Schema
-
-- powerd by jobspy

@@ -56,15 +56,16 @@ const canadaProvinces = [
 
 const jobTags = [
   "Software Engineer",
-  "Web Developer",
+  "Backend Developer",
+  "Fontend Developer",
   "Data Scientist",
   "Product Manager",
+  "Fullstack Developer",
+  "BlockChain Developer",
+  "AI Specialist",
   "UX Designer",
   "DevOps Engineer",
-  "Sales Representative",
-  "Marketing Specialist",
   "Project Manager",
-  "Business Analyst",
 ]
 
 export function JobSearch({ initialJobs }: { initialJobs: Job[] }) {
@@ -540,7 +541,7 @@ export function JobSearch({ initialJobs }: { initialJobs: Job[] }) {
 
     try {
       // CSV header
-      const headers = ["Title", "Company", "Location", "URL","Salary", "Posted Date", "Source"]
+      const headers = ["Title", "Company", "Location", "URL","Posted Date", "Source"]
 
       // Format job data for CSV
       const jobRows = filteredJobs.map((job) => [
