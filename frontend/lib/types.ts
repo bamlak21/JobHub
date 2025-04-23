@@ -11,6 +11,7 @@ export interface Job {
   logo?: ReactNode
   url?: string
   source?: string
+  logoUrl?: string | null
 }
 
 export interface SearchState {

@@ -396,7 +396,9 @@ export function JobSearch({ initialJobs }: { initialJobs: Job[] }) {
           apiJobs = Array.isArray(data)
             ? data.map((item: any[], index: number) => {
                 // Indeed format: [company, title, url, date, salary]
-                const salary = item[4] && item[4] !== "0-0 nan" ? item[4] : "Salary not specified"
+                const logoUrl = item[4] || null
+                const salary = item[5] && item[5] !== "0-0 nan" ? item[5] : "Salary not specified"
+                // const salary = item[4] && item[4] !== "0-0 nan" ? item[4] : "Salary not specified"
 
                 return {
                   id: `indeed-${index}`,
@@ -408,6 +410,7 @@ export function JobSearch({ initialJobs }: { initialJobs: Job[] }) {
                   postedDate: item[3] || new Date().toISOString(),
                   url: item[2] || "#",
                   source: "Indeed",
+                  logoUrl: logoUrl
                 }
               })
             : []

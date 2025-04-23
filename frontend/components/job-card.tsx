@@ -4,7 +4,7 @@ import { formatDistanceToNow } from "date-fns"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import type { Job } from "@/lib/types"
-import { Building2, CalendarDays, DollarSign, MapPin, ExternalLink } from "lucide-react"
+import { BuildingIcon, Building2, CalendarDays, DollarSign, MapPin, ExternalLink } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export function JobCard({ job }: { job: Job }) {
@@ -17,7 +17,15 @@ export function JobCard({ job }: { job: Job }) {
       <CardContent className="p-6">
         <div className="flex flex-col md:flex-row md:items-start gap-4">
           <div className="flex-shrink-0 w-12 h-12 rounded-md bg-primary/10 flex items-center justify-center text-primary">
-            {job.logo || <Building2 className="h-6 w-6" />}
+          {job.logoUrl ? (
+              <img
+                src={job.logoUrl || "/placeholder.svg"}
+                alt={`${job.company} logo`}
+                className="h-10 w-10 object-contain"
+              />
+            ) : (
+              job.logo || <BuildingIcon className="h-6 w-6" />
+            )}
           </div>
 
           <div className="flex-grow space-y-4">
@@ -37,7 +45,10 @@ export function JobCard({ job }: { job: Job }) {
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 pt-2">
               <div className="flex items-center text-sm font-medium text-primary">
                 <DollarSign className="h-4 w-4 mr-1" />
-                {job.salary}
+                {/* {job.salary} */}
+                <span>
+                  {typeof job.salary === "string" ? job.salary : "Salary not specified"}
+                  </span>
               </div>
               <div className="flex items-center text-xs text-muted-foreground">
                 <CalendarDays className="h-3 w-3 mr-1" />

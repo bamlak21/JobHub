@@ -236,7 +236,7 @@ class JobScraper:
             logger.info(f"Found {len(jobs)} jobs using jobspy")
 
             
-            columns_needed = ["company", "title", "job_url", "date_posted"]
+            columns_needed = ["company", "title", "job_url", "date_posted", "company_logo"]
             salary_columns = ["min_amount", "max_amount", "currency"]
             
             
