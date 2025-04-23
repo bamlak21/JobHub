@@ -8,7 +8,7 @@ export async function POST(request: Request) {
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 20000) // 20 second timeout
 
-    const response = await fetch("https://ubgry5tetyhn.share.zrok.io/hirebase/get", {
+    const response = await fetch("https://pjvzmekfqyip.share.zrok.io/hirebase/get", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
