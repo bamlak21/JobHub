@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server"
 
+
+{/* This route has banned our ip address */}
 export async function POST(request: Request) {
   try {
     const body = await request.json()
@@ -39,4 +41,3 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: errorMessage }, { status: 500 })
   }
 }
-

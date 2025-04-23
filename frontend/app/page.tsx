@@ -9,10 +9,7 @@ export default function Home() {
           <img src="/neo1.png" alt="Neo" className="mx-auto mb-2" style={{ maxWidth: "300px" }} />
           <p className="text-muted-foreground max-w-md mx-auto -mt-1">
             Search for opportunities exclusively built for the sales team at NILEODE Technologies.
-            </p>
-
-
-
+          </p>
         </div>
         <div className="max-w-5xl mx-auto">
           <JobSearch initialJobs={jobData} />
@@ -21,4 +18,3 @@ export default function Home() {
     </main>
   )
 }
-

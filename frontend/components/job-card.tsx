@@ -4,7 +4,7 @@ import { formatDistanceToNow } from "date-fns"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import type { Job } from "@/lib/types"
-import { BuildingIcon, Building2, CalendarDays, DollarSign, MapPin, ExternalLink } from "lucide-react"
+import { BuildingIcon, CalendarDays, DollarSign, MapPin, ExternalLink } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export function JobCard({ job }: { job: Job }) {
@@ -17,7 +17,7 @@ export function JobCard({ job }: { job: Job }) {
       <CardContent className="p-6">
         <div className="flex flex-col md:flex-row md:items-start gap-4">
           <div className="flex-shrink-0 w-12 h-12 rounded-md bg-primary/10 flex items-center justify-center text-primary">
-          {job.logoUrl ? (
+            {job.logoUrl ? (
               <img
                 src={job.logoUrl || "/placeholder.svg"}
                 alt={`${job.company} logo`}
@@ -46,9 +46,7 @@ export function JobCard({ job }: { job: Job }) {
               <div className="flex items-center text-sm font-medium text-primary">
                 <DollarSign className="h-4 w-4 mr-1" />
                 {/* {job.salary} */}
-                <span>
-                  {typeof job.salary === "string" ? job.salary : "Salary not specified"}
-                  </span>
+                <span>{typeof job.salary === "string" ? job.salary : "Salary not specified"}</span>
               </div>
               <div className="flex items-center text-xs text-muted-foreground">
                 <CalendarDays className="h-3 w-3 mr-1" />
@@ -75,4 +73,3 @@ export function JobCard({ job }: { job: Job }) {
     </Card>
   )
 }
-

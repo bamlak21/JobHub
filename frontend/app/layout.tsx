@@ -13,6 +13,7 @@ export const metadata: Metadata = {
   icons: {
     icon: "/favicon 32 x 32.png",
   },
+    generator: 'v0.dev'
 }
 
 export default function RootLayout({
@@ -31,4 +32,3 @@ export default function RootLayout({
     </html>
   )
 }
-

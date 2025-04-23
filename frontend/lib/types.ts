@@ -35,5 +35,4 @@ export interface TagState {
   autoFetch: boolean
 }
 
-export type JobPlatform = "indeed" | "linkedin" | "ziprecruiter" | "dice"
-
+export type JobPlatform = "indeed" | "linkedin" | "ziprecruiter" | "dice" | "hirebase"
