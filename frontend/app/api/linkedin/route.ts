@@ -7,7 +7,7 @@ export async function POST(request: Request) {
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 20000) // 20 second timeout
 
-    const response = await fetch("https://ah6ti5nxxwqv.share.zrok.io/linkdin/get", {
+    const response = await fetch("https://n05lj8obzzlw.share.zrok.io/linkdin/get", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
