@@ -45,7 +45,7 @@ export async function POST(request: Request) {
     const timeoutId = setTimeout(() => controller.abort(), 20000) // 20 second timeout
 
     try {
-      const response = await fetch("https://udad7e3hl4l3.share.zrok.io/hirebase/get", {
+      const response = await fetch("https://ah6ti5nxxwqv.share.zrok.io/hirebase/get", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
