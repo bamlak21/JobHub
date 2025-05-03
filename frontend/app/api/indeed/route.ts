@@ -7,7 +7,7 @@ export async function POST(request: Request) {
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 20000) // 20 second timeout
 
-    const response = await fetch("https://r87f330d9ps7.share.zrok.io/indeed/get", {
+    const response = await fetch("https://udad7e3hl4l3.share.zrok.io/indeed/get", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
