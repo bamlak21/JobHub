@@ -20,7 +20,7 @@ export async function POST(request: Request) {
     }
 
     try {
-      const response = await fetch("https://n05lj8obzzlw.share.zrok.io/dice/get", {
+      const response = await fetch(" https://1m2lch23frlq.share.zrok.io/dice/get", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
