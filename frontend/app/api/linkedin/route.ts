@@ -1,13 +1,14 @@
-import { NextResponse } from "next/server"
+import { NextResponse } from "next/server";
+import { baseUrl } from "../request";
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json()
+    const body = await request.json();
 
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 20000) // 20 second timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 20000); // 20 second timeout
 
-    const response = await fetch("https://1m2lch23frlq.share.zrok.io/linkdin/get", {
+    const response = await fetch(`${baseUrl}/linkdin/get`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -18,21 +19,21 @@ export async function POST(request: Request) {
         pagenumber: body.pagenumber,
       }),
       signal: controller.signal,
-    }).finally(() => clearTimeout(timeoutId))
+    }).finally(() => clearTimeout(timeoutId));
 
     if (!response.ok) {
-      throw new Error(`LinkedIn API responded with status: ${response.status}`)
+      throw new Error(`LinkedIn API responded with status: ${response.status}`);
     }
 
-    const data = await response.json()
-    return NextResponse.json(data)
+    const data = await response.json();
+    return NextResponse.json(data);
   } catch (error) {
-    console.error("Error in LinkedIn proxy:", error)
+    console.error("Error in LinkedIn proxy:", error);
     const errorMessage =
       error instanceof Error && error.name === "AbortError"
         ? "Request timed out. Please try again."
-        : "Failed to fetch data from LinkedIn"
+        : "Failed to fetch data from LinkedIn";
 
-    return NextResponse.json({ error: errorMessage }, { status: 500 })
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
